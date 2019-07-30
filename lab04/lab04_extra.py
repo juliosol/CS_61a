@@ -21,7 +21,8 @@ def flatten(lst):
         if type(elt) != list:
             out += [elt]
         else:
-            
+            out += flatten(elt)
+    return out
 
 # Q7
 def merge(lst1, lst2):
@@ -37,6 +38,14 @@ def merge(lst1, lst2):
     [2, 4, 5, 6, 7]
     """
     "*** YOUR CODE HERE ***"
+    if lst1 == []:
+        return lst2
+    elif lst2 == []:
+        return lst1
+    else:
+        lst = lst1 + lst2
+        lst.sort()
+        return lst
 
 ######################
 ### Connect N Game ###
