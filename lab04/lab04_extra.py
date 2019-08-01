@@ -210,7 +210,7 @@ def check_win_row(board, max_rows, max_cols, num_connect, row, player):
     counter = 0
     curr_row = board[row]
     i = 0
-    while i < len(curr_row) and i < max_cols - num_connect:
+    while i < len(curr_row): #and i < max_cols - num_connect:
         if get_piece(board, row, i) == player:
             counter += 1
         else:
@@ -245,10 +245,9 @@ def check_win_column(board, max_rows, max_cols, num_connect, col, player):
     """
     "*** YOUR CODE HERE ***"
     counter = 0
-    curr_row = board[:][col]
     i = 0
-    while i < len(curr_row) and i < max_cols - num_connect:
-        if get_piece(board, row, i) == player:
+    while i < max_rows: #and i < max_rows - num_connect:
+        if get_piece(board, i, col) == player:
             counter += 1
         else:
             counter = 0
@@ -292,6 +291,19 @@ def check_win(board, max_rows, max_cols, num_connect, row, col, player):
     diagonal_win = check_win_diagonal(board, max_rows, max_cols, num_connect,
                                       row, col, player)
     "*** YOUR CODE HERE ***"
+    row_win = check_win_row(board, max_rows, max_cols, num_connect, row, player)
+    col_win = check_win_column(board, max_rows, max_cols, num_connect, col, player)
+    #print(diagonal_win)
+    #print(row_win)
+    #print(col_win)
+    if diagonal_win == True:
+        return True
+    elif row_win == True:
+        return True
+    elif col_win == True:
+        return True
+    else:
+        return False
 
 ###############################################################
 ### Functions for reference when solving the other problems ###
