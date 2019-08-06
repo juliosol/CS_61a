@@ -48,14 +48,20 @@ def group_by_centroid(restaurants, centroids):
     restaurants closest to the same centroid.
     """
     # BEGIN Question 4
-    
+    classif = []
+    for elt in restaurants:
+        curr_centroid = find_closest(restaurant_location(elt), centroids)
+        classif.append([curr_centroid, elt])
+    return group_by_first(classif)
     # END Question 4
 
 
 def find_centroid(cluster):
     """Return the centroid of the locations of the restaurants in cluster."""
     # BEGIN Question 5
-    "*** YOUR CODE HERE ***"
+    lst_rest = [restaurant_location(elt) for elt in cluster]
+    return [mean([x for x,y in lst_rest]), mean([y for x,y in lst_rest])]
+
     # END Question 5
 
 
@@ -70,7 +76,8 @@ def k_means(restaurants, k, max_updates=100):
     while old_centroids != centroids and n < max_updates:
         old_centroids = centroids
         # BEGIN Question 6
-        "*** YOUR CODE HERE ***"
+        clusters = group_by_centroid(restaurants, centroids)
+        centroids = [find_centroid(cluster) for cluster in clusters]
         # END Question 6
         n += 1
     return centroids
