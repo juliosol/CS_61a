@@ -165,7 +165,11 @@ def search(query, restaurants):
     restaurants -- A sequence of restaurants
     """
     # BEGIN Question 10
-    "*** YOUR CODE HERE ***"
+    cat_restaurants = []
+    for rest in restaurants:
+        if query in restaurant_categories(rest):
+            cat_restaurants += [rest]
+    return cat_restaurants
     # END Question 10
 
 
