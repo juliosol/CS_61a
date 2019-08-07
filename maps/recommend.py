@@ -102,7 +102,13 @@ def find_predictor(user, restaurants, feature_fn):
     ys = [user_rating(user, restaurant_name(r)) for r in restaurants]
 
     # BEGIN Question 7
-    "*** YOUR CODE HERE ***"
+    s_xx = sum([(x - mean(xs)) ** 2 for x in xs])
+    s_yy = sum([(y - mean(ys)) ** 2 for y in ys])
+    s_xy = sum([(xs[k] - mean(xs)) * (ys[k] - mean(xs)) for k in range(len(xs))])
+
+    b = s_xy / s_xx
+    a = mean(ys) - b * mean(xs)
+    r_squared = (s_xy ** 2) / (s_xx * s_yy)
     # END Question 7
 
     def predictor(restaurant):
@@ -122,9 +128,12 @@ def best_predictor(user, restaurants, feature_fns):
     """
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 8
-    "*** YOUR CODE HERE ***"
+    #for feat in feature_fns:
+    #    print(find_predictor(user, reviewed, feat)[1])
+    #    print(feat)
+    feat = max(feature_fns, key=lambda x: find_predictor(user, reviewed, x)[1])
+    return find_predictor(user, reviewed, feat)[0]
     # END Question 8
-
 
 def rate_all(user, restaurants, feature_fns):
     """Return the predicted ratings of restaurants by user using the best
@@ -138,7 +147,13 @@ def rate_all(user, restaurants, feature_fns):
     predictor = best_predictor(user, ALL_RESTAURANTS, feature_fns)
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 9
-    "*** YOUR CODE HERE ***"
+    dictionary = {}
+    for rest in restaurants:
+        if rest in reviewed:
+            dictionary.update({restaurant_name(rest): user_rating(user, restaurant_name(rest))})
+        else:
+            dictionary.update({restaurant_name(rest): predictor(rest)})
+    return dictionary
     # END Question 9
 
 
