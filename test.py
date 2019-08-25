@@ -143,3 +143,12 @@ def square_tree(t):
 	else:
 		bs = [square_tree(b) for b in branches(t)]
 		return tree(label(t) ** 2, bs)
+
+def find_path(tree, x):
+	if label(tree) == x:
+		return [label(tree)]
+	for b in branches(tree):
+		path = find_path(b,x)
+		if path:
+			return [label(tree)] + path
+	#return path
