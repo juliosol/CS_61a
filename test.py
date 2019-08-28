@@ -154,9 +154,8 @@ def find_path(tree, x):
 
 def prune(t,k):
 	if k == 0:
+		#return [[label(b)] for b in branches(t)]
 		return [label(t)]
-	for b in branches(t):
-		 
-		  [label(t)] + prune(b,k-1)
-
+	else:
+		return [label(t)] + [prune(b, k-1) for b in branches(t)]
 
