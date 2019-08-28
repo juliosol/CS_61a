@@ -154,8 +154,15 @@ def find_path(tree, x):
 
 def prune(t,k):
 	if k == 0:
-		#return [[label(b)] for b in branches(t)]
 		return [label(t)]
 	else:
 		return [label(t)] + [prune(b, k-1) for b in branches(t)]
 
+def hailstone_tree(n,h):
+	if h == 0:
+		return [n]
+	else:
+		lst = [2 * n]
+		if (n-1)%3 == 0 and (n-1) != 0 and (n-1) // 3 != 1:
+			lst = lst + [(n-1)//3]
+		return [n] + [hailstone_tree(elt, h-1) for elt in lst]
