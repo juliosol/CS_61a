@@ -99,6 +99,10 @@ def replace_leaf(t, old, new):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t) == True and label(t) == old:
+        return tree(new)
+    else:
+        return tree(label(t), [replace_leaf(b, old, new) for b in branches(t)])
 
 # Mobiles
 
@@ -143,13 +147,15 @@ def end(s):
 
 def weight(size):
     """Construct a weight of some size."""
-    assert size > 0
+    assert size > 0, "weight must be bigger than 0"
     "*** YOUR CODE HERE ***"
+    return ['weight', size]
 
 def size(w):
     """Select the size of a weight."""
     assert is_weight(w), 'must call size on a weight'
     "*** YOUR CODE HERE ***"
+    return w[1]
 
 def is_weight(w):
     """Whether w is a weight."""
@@ -198,6 +204,12 @@ def balanced(m):
     False
     """
     "*** YOUR CODE HERE ***"
+    #print(length(left(m)))
+    if length(left(m)) * total_weight(end(left(m))) == length(right(m)) * total_weight(end(right(m))):
+        return True
+    else:
+        return False
+
 
 def totals_tree(m):
     """Return a tree representing the mobile with its total weight at the root.
