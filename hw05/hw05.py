@@ -271,7 +271,11 @@ def make_counter():
     >>> c('b') + c2('b')
     5
     """
-    "*** YOUR CODE HERE ***"
+    dict_elts = {}
+    def memory(x):
+        dict_elts[x] = dict_elts.get(x,0) + 1 
+        return dict_elts[x]
+    return memory
 
 def make_fib():
     """Returns a function that returns the next Fibonacci number
@@ -293,6 +297,29 @@ def make_fib():
     12
     """
     "*** YOUR CODE HERE ***"
+    #dict_fib = {'prev':0, 'next':1}
+    #def fib_helper():
+    #    ret_val = dict_fib['prev']
+    #    sum_val = dict_fib['prev'] + dict_fib['next']
+    #    dict_fib['prev'] = dict_fib['next']
+    #    dict_fib['next'] = sum_val
+    #    return ret_val
+    #fib_list = [0,1]
+    #def fib_helper():
+    #    nonlocal fib_list
+    #    ret_val = fib_list[0]
+    #    sum_val = sum(fib_list)
+    #    fib_list.append(sum_val)
+    #    fib_list = fib_list[1:]
+    #    return ret_val
+    x,y = 0,1
+    def fib_helper():
+        nonlocal x,y
+        ret = x
+        y, x = x + y,y
+        return ret
+
+    return fib_helper
 
 def make_withdraw(balance, password):
     """Return a password-protected withdraw function.
