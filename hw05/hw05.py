@@ -205,10 +205,18 @@ def balanced(m):
     """
     "*** YOUR CODE HERE ***"
     #print(length(left(m)))
-    if length(left(m)) * total_weight(end(left(m))) == length(right(m)) * total_weight(end(right(m))):
+    #if length(left(m)) * total_weight(end(left(m))) == length(right(m)) * total_weight(end(right(m))):
+    #    return True
+    #else:
+    #    return False
+    if is_weight(m):
         return True
     else:
-        return False
+        left_part = end(left(m))
+        right_part = end(right(m))
+        length_right = length(right(m))
+        length_left = length(left(m))
+        return length_right * total_weight(right_part) == length_left * total_weight(left_part) and balanced(left_part) and balanced(right_part)
 
 
 def totals_tree(m):
