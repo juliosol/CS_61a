@@ -354,7 +354,6 @@ def make_withdraw(balance, password):
     def withdraw_helper(new_balance, entered_password):
         nonlocal balance
         nonlocal wrong_passwords
-        #print("This are wrong_passwords", wrong_passwords)
         if len(wrong_passwords) < 3:
             if entered_password is not password:
                 wrong_passwords.append(entered_password)
@@ -409,6 +408,19 @@ def make_joint(withdraw, old_password, new_password):
     "Your account is locked. Attempts: ['my', 'secret', 'password']"
     """
     "*** YOUR CODE HERE ***"
+
+    result = withdraw(0, old_password)
+    
+    def joint_helper(balance, password):
+        if password == new_password or password == old_password:
+            return withdraw(balance, old_password)
+        return withdraw(balance, password)
+
+    if type(result) == str:
+        return result
+    else:    
+        return joint_helper 
+
 
 # Generators
 

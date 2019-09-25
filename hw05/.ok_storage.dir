@@ -5,3 +5,4 @@
 'make_counter-correct', (2048, 70)
 'make_fib-correct', (2560, 70)
 'make_withdraw-correct', (3072, 70)
+'make_joint-correct', (3584, 70)
