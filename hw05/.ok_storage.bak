@@ -6,3 +6,4 @@
 'make_fib-correct', (2560, 70)
 'make_withdraw-correct', (3072, 70)
 'make_joint-correct', (3584, 70)
+'generate_paths-correct', (4096, 70)

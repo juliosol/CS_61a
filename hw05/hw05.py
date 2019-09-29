@@ -457,8 +457,16 @@ def generate_paths(t, x):
     >>> path_to_2 = generate_paths(t2, 2)
     >>> sorted(list(path_to_2))
     [[0, 2], [0, 2, 1, 2]]
+    >>> path_to_5 = generate_paths(t2,5)
+    >>> sorted(list(path_to_5))
+    [[0, 2, 1, 2, 5], [0, 2, 1, 5]]
     """
-    "*** YOUR CODE HERE ***"
+    #print(t)
+    if label(t) == x:
+        yield [x]
+    for b in branches(t):
+        for path in generate_paths(b,x):
+            yield [label(t)] + path
 
 ###################
 # Extra Questions #
