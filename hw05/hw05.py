@@ -1,7 +1,3 @@
-#########
-# Trees #
-#########
-
 def tree(label, branches=[]):
     """Construct a tree with the given label value and a list of branches."""
     for branch in branches:
@@ -65,9 +61,9 @@ def copy_tree(t):
     """
     return tree(label(t), [copy_tree(b) for b in branches(t)])
 
-######################
-# Required questions #
-######################
+#############
+# Questions #
+#############
 
 def replace_leaf(t, old, new):
     """Returns a new tree where every leaf value equal to old has
@@ -99,67 +95,86 @@ def replace_leaf(t, old, new):
     True
     """
     "*** YOUR CODE HERE ***"
-    if is_leaf(t) == True and label(t) == old:
-        return tree(new)
-    else:
-        return tree(label(t), [replace_leaf(b, old, new) for b in branches(t)])
 
-# Mobiles
+def print_move(origin, destination):
+    """Print instructions to move a disk."""
+    print("Move the top disk from rod", origin, "to rod", destination)
+
+def move_stack(n, start, end):
+    """Print the moves required to move n disks on the start pole to the end
+    pole without violating the rules of Towers of Hanoi.
+
+    n -- number of disks
+    start -- a pole position, either 1, 2, or 3
+    end -- a pole position, either 1, 2, or 3
+
+    There are exactly three poles, and start and end must be different. Assume
+    that the start pole has at least n disks of increasing size, and the end
+    pole is either empty or has a top disk larger than the top n start disks.
+
+    >>> move_stack(1, 1, 3)
+    Move the top disk from rod 1 to rod 3
+    >>> move_stack(2, 1, 3)
+    Move the top disk from rod 1 to rod 2
+    Move the top disk from rod 1 to rod 3
+    Move the top disk from rod 2 to rod 3
+    >>> move_stack(3, 1, 3)
+    Move the top disk from rod 1 to rod 3
+    Move the top disk from rod 1 to rod 2
+    Move the top disk from rod 3 to rod 2
+    Move the top disk from rod 1 to rod 3
+    Move the top disk from rod 2 to rod 1
+    Move the top disk from rod 2 to rod 3
+    Move the top disk from rod 1 to rod 3
+    """
+    assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
+    "*** YOUR CODE HERE ***"
+
+###########
+# Mobiles #
+###########
 
 def mobile(left, right):
     """Construct a mobile from a left side and a right side."""
-    assert is_side(left), "left must be a side"
-    assert is_side(right), "right must be a side"
-    return ['mobile', left, right]
+    return tree('mobile', [left, right])
 
 def is_mobile(m):
-    """Return whether m is a mobile."""
-    return type(m) == list and len(m) == 3 and m[0] == 'mobile'
+    return is_tree(m) and label(m) == 'mobile'
 
-def left(m):
-    """Select the left side of a mobile."""
-    assert is_mobile(m), "must call left on a mobile"
-    return m[1]
+def sides(m):
+    """Select the sides of a mobile."""
+    assert is_mobile(m), "must call sides on a mobile"
+    return branches(m)
 
-def right(m):
-    """Select the right side of a mobile."""
-    assert is_mobile(m), "must call right on a mobile"
-    return m[2]
+def is_side(m):
+    return not is_mobile(m) and not is_weight(m) and type(label(m)) == int
 
 def side(length, mobile_or_weight):
     """Construct a side: a length of rod with a mobile or weight at the end."""
-    assert is_mobile(mobile_or_weight) or is_weight(mobile_or_weight)
-    return ['side', length, mobile_or_weight]
-
-def is_side(s):
-    """Return whether s is a side."""
-    return type(s) == list and len(s) == 3 and s[0] == 'side'
+    return tree(length, [mobile_or_weight])
 
 def length(s):
     """Select the length of a side."""
     assert is_side(s), "must call length on a side"
-    return s[1]
+    return label(s)
 
 def end(s):
     """Select the mobile or weight hanging at the end of a side."""
     assert is_side(s), "must call end on a side"
-    return s[2]
+    return branches(s)[0]
 
 def weight(size):
     """Construct a weight of some size."""
-    assert size > 0, "weight must be bigger than 0"
+    assert size > 0
     "*** YOUR CODE HERE ***"
-    return ['weight', size]
 
 def size(w):
     """Select the size of a weight."""
-    assert is_weight(w), 'must call size on a weight'
     "*** YOUR CODE HERE ***"
-    return w[1]
 
 def is_weight(w):
-    """Whether w is a weight."""
-    return type(w) == list and len(w) == 2 and w[0] == 'weight'
+    """Whether w is a weight, not a mobile."""
+    "*** YOUR CODE HERE ***"
 
 def examples():
     t = mobile(side(1, weight(2)),
@@ -169,6 +184,7 @@ def examples():
                               side(3, weight(2)))))
     v = mobile(side(4, t), side(2, u))
     return (t, u, v)
+
 
 def total_weight(m):
     """Return the total weight of m, a weight or mobile.
@@ -185,7 +201,7 @@ def total_weight(m):
         return size(m)
     else:
         assert is_mobile(m), "must get total weight of a mobile or a weight"
-        return total_weight(end(left(m))) + total_weight(end(right(m)))
+        return sum([total_weight(end(s)) for s in sides(m)])
 
 def balanced(m):
     """Return whether m is balanced.
@@ -204,52 +220,87 @@ def balanced(m):
     False
     """
     "*** YOUR CODE HERE ***"
-    #print(length(left(m)))
-    #if length(left(m)) * total_weight(end(left(m))) == length(right(m)) * total_weight(end(right(m))):
-    #    return True
-    #else:
-    #    return False
-    if is_weight(m):
-        return True
-    else:
-        left_part = end(left(m))
-        right_part = end(right(m))
-        length_right = length(right(m))
-        length_left = length(left(m))
-        return length_right * total_weight(right_part) == length_left * total_weight(left_part) and balanced(left_part) and balanced(right_part)
 
+#######
+# OOP #
+#######
 
-def totals_tree(m):
-    """Return a tree representing the mobile with its total weight at the root.
+class Account:
+    """An account has a balance and a holder.
 
-    >>> t, u, v = examples()
-    >>> print_tree(totals_tree(t))
-    3
-      2
-      1
-    >>> print_tree(totals_tree(u))
-    6
-      1
-      5
-        3
-        2
-    >>> print_tree(totals_tree(v))
-    9
-      3
-        2
-        1
-      6
-        1
-        5
-          3
-          2
+    >>> a = Account('John')
+    >>> a.deposit(10)
+    10
+    >>> a.balance
+    10
+    >>> a.interest
+    0.02
+
+    >>> a.time_to_retire(10.25) # 10 -> 10.2 -> 10.404
+    2
+    >>> a.balance               # balance should not change
+    10
+    >>> a.time_to_retire(11)    # 10 -> 10.2 -> ... -> 11.040808032
+    5
+    >>> a.time_to_retire(100)
+    117
     """
-    if is_weight(m):
-        return tree(total_weight(m))
-    elif is_mobile(m):
-        return tree(total_weight(m), [totals_tree(end(left(m))), totals_tree(end(right(m)))])
 
-# Mutable functions in Python
+    interest = 0.02  # A class attribute
+
+    def __init__(self, account_holder):
+        self.holder = account_holder
+        self.balance = 0
+
+    def deposit(self, amount):
+        """Add amount to balance."""
+        self.balance = self.balance + amount
+        return self.balance
+
+    def withdraw(self, amount):
+        """Subtract amount from balance if funds are available."""
+        if amount > self.balance:
+            return 'Insufficient funds'
+        self.balance = self.balance - amount
+        return self.balance
+
+    def time_to_retire(self, amount):
+        """Return the number of years until balance would grow to amount."""
+        assert self.balance > 0 and amount > 0 and self.interest > 0
+        "*** YOUR CODE HERE ***"
+
+class FreeChecking(Account):
+    """A bank account that charges for withdrawals, but the first two are free!
+
+    >>> ch = FreeChecking('Jack')
+    >>> ch.balance = 20
+    >>> ch.withdraw(100)  # First one's free
+    'Insufficient funds'
+    >>> ch.withdraw(3)    # And the second
+    17
+    >>> ch.balance
+    17
+    >>> ch.withdraw(3)    # Ok, two free withdrawals is enough
+    13
+    >>> ch.withdraw(3)
+    9
+    >>> ch2 = FreeChecking('John')
+    >>> ch2.balance = 10
+    >>> ch2.withdraw(3) # No fee
+    7
+    >>> ch.withdraw(3)  # ch still charges a fee
+    5
+    >>> ch.withdraw(5)  # Not enough to cover fee + withdraw
+    'Insufficient funds'
+    """
+    withdraw_fee = 1
+    free_withdrawals = 2
+
+    "*** YOUR CODE HERE ***"
+
+############
+# Mutation #
+############
 
 def make_counter():
     """Return a counter function.
@@ -271,11 +322,7 @@ def make_counter():
     >>> c('b') + c2('b')
     5
     """
-    dict_elts = {}
-    def memory(x):
-        dict_elts[x] = dict_elts.get(x,0) + 1 
-        return dict_elts[x]
-    return memory
+    "*** YOUR CODE HERE ***"
 
 def make_fib():
     """Returns a function that returns the next Fibonacci number
@@ -297,29 +344,6 @@ def make_fib():
     12
     """
     "*** YOUR CODE HERE ***"
-    #dict_fib = {'prev':0, 'next':1}
-    #def fib_helper():
-    #    ret_val = dict_fib['prev']
-    #    sum_val = dict_fib['prev'] + dict_fib['next']
-    #    dict_fib['prev'] = dict_fib['next']
-    #    dict_fib['next'] = sum_val
-    #    return ret_val
-    #fib_list = [0,1]
-    #def fib_helper():
-    #    nonlocal fib_list
-    #    ret_val = fib_list[0]
-    #    sum_val = sum(fib_list)
-    #    fib_list.append(sum_val)
-    #    fib_list = fib_list[1:]
-    #    return ret_val
-    x,y = 0,1
-    def fib_helper():
-        nonlocal x,y
-        ret = x
-        y, x = x + y,y
-        return ret
-
-    return fib_helper
 
 def make_withdraw(balance, password):
     """Return a password-protected withdraw function.
@@ -334,7 +358,7 @@ def make_withdraw(balance, password):
     >>> error
     'Incorrect password'
     >>> new_bal = w(25, 'hax0r')
-    >>> new_bal
+    >>> new
     50
     >>> w(75, 'a')
     'Incorrect password'
@@ -350,24 +374,6 @@ def make_withdraw(balance, password):
     True
     """
     "*** YOUR CODE HERE ***"
-    wrong_passwords = []
-    def withdraw_helper(new_balance, entered_password):
-        nonlocal balance
-        nonlocal wrong_passwords
-        if len(wrong_passwords) < 3:
-            if entered_password is not password:
-                wrong_passwords.append(entered_password)
-                return "Incorrect password"
-            if new_balance > balance:
-                return "Insufficient funds"
-            if entered_password == password:
-                balance = balance - new_balance
-                return balance
-        if len(wrong_passwords) >= 3:
-            return "Your account is locked. Attempts: " + str(wrong_passwords)
-        
-    return withdraw_helper
-
 
 def make_joint(withdraw, old_password, new_password):
     """Return a password-protected withdraw function that has joint access to
@@ -409,68 +415,21 @@ def make_joint(withdraw, old_password, new_password):
     """
     "*** YOUR CODE HERE ***"
 
-    result = withdraw(0, old_password)
-    
-    def joint_helper(balance, password):
-        if password == new_password or password == old_password:
-            return withdraw(balance, old_password)
-        return withdraw(balance, password)
-
-    if type(result) == str:
-        return result
-    else:    
-        return joint_helper 
-
-
-# Generators
-
-def generate_paths(t, x):
-    """Yields all possible paths from the root of t to a node with the label x
-    as a list.
-
-    >>> t1 = tree(1, [tree(2, [tree(3), tree(4, [tree(6)]), tree(5)]), tree(5)])
-    >>> print_tree(t1)
-    1
-      2
-        3
-        4
-          6
-        5
-      5
-    >>> next(generate_paths(t1, 6))
-    [1, 2, 4, 6]
-    >>> path_to_5 = generate_paths(t1, 5)
-    >>> sorted(list(path_to_5))
-    [[1, 2, 5], [1, 5]]
-
-    >>> t2 = tree(0, [tree(2, [t1])])
-    >>> print_tree(t2)
-    0
-      2
-        1
-          2
-            3
-            4
-              6
-            5
-          5
-    >>> path_to_2 = generate_paths(t2, 2)
-    >>> sorted(list(path_to_2))
-    [[0, 2], [0, 2, 1, 2]]
-    >>> path_to_5 = generate_paths(t2,5)
-    >>> sorted(list(path_to_5))
-    [[0, 2, 1, 2, 5], [0, 2, 1, 5]]
-    """
-    #print(t)
-    if label(t) == x:
-        yield [x]
-    for b in branches(t):
-        for path in generate_paths(b,x):
-            yield [label(t)] + path
-
 ###################
 # Extra Questions #
 ###################
+
+def interval(a, b):
+    """Construct an interval from a to b."""
+    return [a, b]
+
+def lower_bound(x):
+    """Return the lower bound of interval x."""
+    "*** YOUR CODE HERE ***"
+
+def upper_bound(x):
+    """Return the upper bound of interval x."""
+    "*** YOUR CODE HERE ***"
 
 def str_interval(x):
     """Return a string representation of interval x."""
@@ -483,53 +442,25 @@ def add_interval(x, y):
     upper = upper_bound(x) + upper_bound(y)
     return interval(lower, upper)
 
-def interval(a, b):
-    """Construct an interval from a to b."""
-    return [a, b]
-
-def lower_bound(x):
-    """Return the lower bound of interval x."""
-    "*** YOUR CODE HERE ***"
-    return x[0]
-
-def upper_bound(x):
-    """Return the upper bound of interval x."""
-    "*** YOUR CODE HERE ***"
-    return x[1]
-
 def mul_interval(x, y):
     """Return the interval that contains the product of any value in x and any
     value in y."""
-    #p1 = x[0] * y[0]
-    #p2 = x[0] * y[1]
-    #p3 = x[1] * y[0]
-    #p4 = x[1] * y[1]
-    #return [min(p1, p2, p3, p4), max(p1, p2, p3, p4)]
-    p1 = lower_bound(x) * lower_bound(y)
-    p2 = lower_bound(x) * upper_bound(y)
-    p3 = upper_bound(x) * lower_bound(y)
-    p4 = upper_bound(x) * upper_bound(y)
-    return interval(min(p1,p2, p3,p4), max(p1,p2,p3,p4))
+    p1 = x[0] * y[0]
+    p2 = x[0] * y[1]
+    p3 = x[1] * y[0]
+    p4 = x[1] * y[1]
+    return [min(p1, p2, p3, p4), max(p1, p2, p3, p4)]
 
 def sub_interval(x, y):
     """Return the interval that contains the difference between any value in x
     and any value in y."""
-    p1 = lower_bound(x) - lower_bound(y)
-    p2 = lower_bound(x) - upper_bound(y)
-    p3 = upper_bound(x) - lower_bound(y)
-    p4 = upper_bound(x) - upper_bound(y)
-    return interval(min(p1, p2, p3, p4), max(p1,p2,p3,p4))
+    "*** YOUR CODE HERE ***"
 
 def div_interval(x, y):
     """Return the interval that contains the quotient of any value in x divided by
     any value in y. Division is implemented as the multiplication of x by the
     reciprocal of y."""
     "*** YOUR CODE HERE ***"
-    #print(lower_bound(y) <= 0)
-    #print(upper_bound(y) >= 0)
-    #print(lower_bound(y) <= 0 and upper_bound(y)>=0 )
-    assert not lower_bound(y) <= 0 and upper_bound(y) >= 0, 'Interval cannot span 0.'
-    #print("Past asswert")
     reciprocal_y = interval(1/upper_bound(y), 1/lower_bound(y))
     return mul_interval(x, reciprocal_y)
 
@@ -551,7 +482,7 @@ def check_par():
     >>> lower_bound(x) != lower_bound(y) or upper_bound(x) != upper_bound(y)
     True
     """
-    r1 = interval(1/4, 2/3) # Replace this line!
+    r1 = interval(1, 1) # Replace this line!
     r2 = interval(1, 1) # Replace this line!
     return r1, r2
 
@@ -568,11 +499,17 @@ def quadratic(x, a, b, c):
     '0 to 10'
     """
     "*** YOUR CODE HERE ***"
-    
-    vert_y = -b**2 /(4*a) + c
-    upper = a * upper_bound(x) * upper_bound(x) + b * upper_bound(x) + c
-    lower = a * lower_bound(x) * lower_bound(x) + b * lower_bound(x) + c
-    if -b/(2*a) > lower_bound(x) and -b/(2*a) < upper_bound(x):
-        return interval(min(vert_y, upper, lower,0), max(vert_y, upper, lower))
-    else:
-        return interval(min(upper,lower), max(upper,lower))
+
+def polynomial(x, c):
+    """Return the interval that is the range of the polynomial defined by
+    coefficients c, for domain interval x.
+
+    >>> str_interval(polynomial(interval(0, 2), [-1, 3, -2]))
+    '-3 to 0.125'
+    >>> str_interval(polynomial(interval(1, 3), [1, -3, 2]))
+    '0 to 10'
+    >>> str_interval(polynomial(interval(0.5, 2.25), [10, 24, -6, -8, 3]))
+    '18.0 to 23.0'
+    """
+    "*** YOUR CODE HERE ***"
+
