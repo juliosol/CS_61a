@@ -1,6 +1,34 @@
 """ Lab 05: Mutable Sequences and Trees """
+# Q2
+def map(fn, seq):
+    """Applies fn onto each element in seq and returns a list.
 
-# Q1
+    >>> map(lambda x: x*x, [1, 2, 3])
+    [1, 4, 9]
+    """
+    "*** YOUR CODE HERE ***"
+
+def filter(pred, seq):
+    """Keeps elements in seq only if they satisfy pred.
+
+    >>> filter(lambda x: x % 2 == 0, [1, 2, 3, 4])
+    [2, 4]
+    """
+    "*** YOUR CODE HERE ***"
+
+def reduce(combiner, seq):
+    """Combines elements in seq using combiner.
+
+    >>> reduce(lambda x, y: x + y, [1, 2, 3, 4])
+    10
+    >>> reduce(lambda x, y: x * y, [1, 2, 3, 4])
+    24
+    >>> reduce(lambda x, y: x * y, [4])
+    4
+    """
+    "*** YOUR CODE HERE ***"
+
+# Q3
 def acorn_finder(t):
     """Returns True if t contains a node with the value 'acorn' and
     False otherwise.
@@ -16,81 +44,38 @@ def acorn_finder(t):
     False
     """
     "*** YOUR CODE HERE ***"
-    if label(t) == 'acorn':
-      return True
-    else:
-      for b in branches(t):
-        if acorn_finder(b):
-          return True
-      return False
-        
 
-# Q2
-def prune_leaves(t, vals):
-    """Return a modified copy of t with all leaves that have a label
-    that appears in vals removed.  Return None if the entire tree is
-    pruned away.
+# Q4
+def replace_leaf(t, old, new):
+    """Returns a new tree where every leaf value equal to old has
+    been replaced with new.
 
-    >>> t = tree(2)
-    >>> print(prune_leaves(t, (1, 2)))
-    None
-    >>> numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
-    >>> print_tree(numbers)
-    1
-      2
-      3
-        4
-        5
-      6
-        7
-    >>> print_tree(prune_leaves(numbers, (3, 4, 6, 7)))
-    1
-      2
-      3
-        5
-      6
-    """
-    "*** YOUR CODE HERE ***"  
-    if is_leaf(t):
-      if label(t) in vals:
-        return None
-      else:
-        return t
-    pruned = [prune_leaves(b, vals) for b in branches(t)]
-    return tree(label(t), [b for b in pruned if b is not None])
-    
-    #if is_leaf(t) and label(t) in vals:
-    #  if branches(t) == []:
-    #    return None
-    #  else: 
-    #    return tree([])
-    #elif not is_leaf(t):
-    #  tmp_tree = tree(label(t))
-    #  for b in branches(t):
-    #    if prune_leaves(b, vals) is not None:
-    #      tmp_tree = tmp_tree + [prune_leaves(b,vals)]
-    #else:
-    #  return tree(label(t))
-    #return tmp_tree
-
-
-# Q3
-def memory(n):
-    """
-    >>> f = memory(10)
-    >>> f(lambda x: x * 2)
-    20
-    >>> f(lambda x: x - 7)
-    13
-    >>> f(lambda x: x > 5)
+    >>> yggdrasil = tree('odin',
+    ...                  [tree('balder',
+    ...                        [tree('thor'),
+    ...                         tree('loki')]),
+    ...                   tree('frigg',
+    ...                        [tree('thor')]),
+    ...                   tree('thor',
+    ...                        [tree('sif'),
+    ...                         tree('thor')]),
+    ...                   tree('thor')])
+    >>> laerad = copy_tree(yggdrasil) # copy yggdrasil for testing purposes
+    >>> print_tree(replace_leaf(yggdrasil, 'thor', 'freya'))
+    odin
+      balder
+        freya
+        loki
+      frigg
+        freya
+      thor
+        sif
+        freya
+      freya
+    >>> laerad == yggdrasil # Make sure original tree is unmodified
     True
     """
     "*** YOUR CODE HERE ***"
-    def helper(func):
-      nonlocal n
-      n = func(n)
-      return n
-    return helper
 
 # Tree ADT
 def tree(label, branches=[]):

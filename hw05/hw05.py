@@ -95,6 +95,10 @@ def replace_leaf(t, old, new):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        if label(t) == old:
+            return tree(new)
+    return tree(label(t), [replace_leaf(br, old, new) for br in branches(t)])
 
 def print_move(origin, destination):
     """Print instructions to move a disk."""
@@ -129,6 +133,14 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    inter = 6 - start - end
+    base_string = 'Move the top disk from '
+    if n == 1:
+        return print(base_string + 'rod ' + str(start) + ' to rod ' + str(end))
+    move_stack(n-1, start, inter)
+    move_stack(1, start, end)
+    move_stack(n-1, inter, end)
+
 
 ###########
 # Mobiles #
@@ -167,14 +179,17 @@ def weight(size):
     """Construct a weight of some size."""
     assert size > 0
     "*** YOUR CODE HERE ***"
+    return tree('weight', [tree(size)])
 
 def size(w):
     """Select the size of a weight."""
     "*** YOUR CODE HERE ***"
+    return label(branches(w)[0])
 
 def is_weight(w):
     """Whether w is a weight, not a mobile."""
     "*** YOUR CODE HERE ***"
+    return not is_mobile(w) and label(w) == 'weight'
 
 def examples():
     t = mobile(side(1, weight(2)),
@@ -219,7 +234,19 @@ def balanced(m):
     >>> balanced(mobile(side(1, w), side(1, v)))
     False
     """
-    "*** YOUR CODE HERE ***"
+    #print(m)
+    if is_weight(m):
+        return True
+    left, right = sides(m)
+    left_torque = length(left) * total_weight(end(left))
+    right_torque = length(right) * total_weight(end(right))
+    
+    equal_torque = left_torque == right_torque
+
+    left_balanced = balanced(end(left))
+    right_balanced = balanced(end(right))
+
+    return equal_torque and left_balanced and right_balanced
 
 #######
 # OOP #
@@ -268,6 +295,13 @@ class Account:
         """Return the number of years until balance would grow to amount."""
         assert self.balance > 0 and amount > 0 and self.interest > 0
         "*** YOUR CODE HERE ***"
+        year = 0
+        tmp_balance = self.balance
+        while tmp_balance < amount:
+            tmp_balance += tmp_balance * self.interest
+            year += 1
+
+        return year
 
 class FreeChecking(Account):
     """A bank account that charges for withdrawals, but the first two are free!
@@ -296,7 +330,13 @@ class FreeChecking(Account):
     withdraw_fee = 1
     free_withdrawals = 2
 
-    "*** YOUR CODE HERE ***"
+    def withdraw(self, amount):
+        if self.free_withdrawals <= 0:
+            return Account.withdraw(self, amount + self.withdraw_fee)
+        else:
+            self.free_withdrawals -= 1
+            return Account.withdraw(self, amount)
+        
 
 ############
 # Mutation #
@@ -323,6 +363,15 @@ def make_counter():
     5
     """
     "*** YOUR CODE HERE ***"
+    dict_letters = {}
+    def counter_dict(letter):
+        nonlocal dict_letters
+        if letter not in dict_letters.keys():
+            dict_letters[letter] = 1
+        else:
+            dict_letters[letter] += 1
+        return dict_letters[letter]
+    return counter_dict
 
 def make_fib():
     """Returns a function that returns the next Fibonacci number
@@ -344,6 +393,14 @@ def make_fib():
     12
     """
     "*** YOUR CODE HERE ***"
+    curr = 0
+    next_val = 1
+    def next_fibo():
+        nonlocal curr, next_val
+        print_curr = curr
+        curr, next_val = next_val, curr + next_val
+        return print_curr
+    return next_fibo
 
 def make_withdraw(balance, password):
     """Return a password-protected withdraw function.
@@ -358,7 +415,7 @@ def make_withdraw(balance, password):
     >>> error
     'Incorrect password'
     >>> new_bal = w(25, 'hax0r')
-    >>> new
+    >>> new_bal
     50
     >>> w(75, 'a')
     'Incorrect password'
@@ -373,7 +430,23 @@ def make_withdraw(balance, password):
     >>> type(w(10, 'l33t')) == str
     True
     """
-    "*** YOUR CODE HERE ***"
+    attempted_password = []
+    def withdraw_checker(amount, given_password):
+        nonlocal attempted_password, balance
+        if len(attempted_password) == 3:
+            return 'Your account is locked. Attempts: %s' % attempted_password
+        if given_password != password:
+            attempted_password.append(given_password)
+            return 'Incorrect password'
+        else:
+            if amount > balance:
+                return 'Insufficient funds'
+            balance = balance - amount
+            return balance
+
+    return withdraw_checker
+
+
 
 def make_joint(withdraw, old_password, new_password):
     """Return a password-protected withdraw function that has joint access to
@@ -413,7 +486,16 @@ def make_joint(withdraw, old_password, new_password):
     >>> make_joint(w, 'hax0r', 'hello')
     "Your account is locked. Attempts: ['my', 'secret', 'password']"
     """
-    "*** YOUR CODE HERE ***"
+    tmp_result = withdraw(0, old_password)
+    if type(tmp_result) == str:
+        return tmp_result
+   
+    def helper_withdraw(amount, pwd):
+        if pwd == new_password or pwd == old_password:
+            return withdraw(amount, old_password)
+        return withdraw(amount, pwd)
+
+    return helper_withdraw
 
 ###################
 # Extra Questions #

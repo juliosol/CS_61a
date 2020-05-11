@@ -22,16 +22,7 @@ def build_successors_table(tokens):
     for word in tokens:
         if prev not in table:
             "*** YOUR CODE HERE ***"
-            index = tokens.index(prev) + 1 if tokens.index(prev) + 1 != len(tokens) else 0
-            table[prev] = [tokens[index]]
         "*** YOUR CODE HERE ***"
-        print("This is word", word)
-        print("This is table", table)
-        indexes = [index for index in range(len(tokens)) if tokens[index] == word]#[1:]
-        print(indexes)
-        for idx in indexes:
-          table[prev].append(tokens[idx + 1])
-        print("This is table after adding indexes", table)
         prev = word
     return table
 
@@ -69,7 +60,34 @@ def random_sent():
     import random
     return construct_sent(random.choice(table['.']), table)
 
-# Q6
+# Q8
+def prune_leaves(t, vals):
+    """Return a modified copy of t with all leaves that have a label
+    that appears in vals removed.  Return None if the entire tree is
+    pruned away.
+
+    >>> t = tree(2)
+    >>> print(prune_leaves(t, (1, 2)))
+    None
+    >>> numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
+    >>> print_tree(numbers)
+    1
+      2
+      3
+        4
+        5
+      6
+        7
+    >>> print_tree(prune_leaves(numbers, (3, 4, 6, 7)))
+    1
+      2
+      3
+        5
+      6
+    """
+    "*** YOUR CODE HERE ***"
+
+# Q9
 def sprout_leaves(t, vals):
     """Sprout new leaves containing the data in vals at each leaf in
     the original tree t and return the resulting tree.
@@ -105,7 +123,7 @@ def sprout_leaves(t, vals):
     """
     "*** YOUR CODE HERE ***"
 
-# Q7
+# Q10
 def add_trees(t1, t2):
     """
     >>> numbers = tree(1,
