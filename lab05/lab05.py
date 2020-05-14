@@ -6,7 +6,9 @@ def map(fn, seq):
     >>> map(lambda x: x*x, [1, 2, 3])
     [1, 4, 9]
     """
-    "*** YOUR CODE HERE ***"
+    for s in range(len(seq)):
+        seq[s] = fn(seq[s])
+    return seq
 
 def filter(pred, seq):
     """Keeps elements in seq only if they satisfy pred.
@@ -14,7 +16,12 @@ def filter(pred, seq):
     >>> filter(lambda x: x % 2 == 0, [1, 2, 3, 4])
     [2, 4]
     """
-    "*** YOUR CODE HERE ***"
+    output = []
+    for s in seq:
+        if pred(s):
+            output.append(s)
+
+    return output
 
 def reduce(combiner, seq):
     """Combines elements in seq using combiner.
@@ -26,7 +33,14 @@ def reduce(combiner, seq):
     >>> reduce(lambda x, y: x * y, [4])
     4
     """
-    "*** YOUR CODE HERE ***"
+    first_element = seq[0]
+    if len(seq) == 1:
+        return first_element
+    else:
+        for s in seq[1:]:
+            first_element = combiner(first_element, s)
+    
+        return first_element
 
 # Q3
 def acorn_finder(t):
@@ -43,7 +57,15 @@ def acorn_finder(t):
     >>> acorn_finder(numbers)
     False
     """
-    "*** YOUR CODE HERE ***"
+    if label(t) == 'acorn':
+        return True
+
+    output = False
+    for br in branches(t):
+        if acorn_finder(br):
+            output = True
+    return output
+
 
 # Q4
 def replace_leaf(t, old, new):
@@ -75,7 +97,14 @@ def replace_leaf(t, old, new):
     >>> laerad == yggdrasil # Make sure original tree is unmodified
     True
     """
-    "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        if label(t) == old:
+            return tree(new)
+        else:
+            return t
+    
+    return tree(label(t),[replace_leaf(br, old, new) for br in branches(t)])
+
 
 # Tree ADT
 def tree(label, branches=[]):
