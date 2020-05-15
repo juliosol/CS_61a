@@ -24,7 +24,8 @@ class Place(object):
         self.entrance = None  # A Place
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
-        "*** YOUR CODE HERE ***"
+        if exit:
+            exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -194,6 +195,9 @@ class ThrowerAnt(Ant):
     damage = 1
     food_cost = 3
 
+    min_range = -1
+    max_range = float('inf')
+
     def nearest_bee(self, hive):
         """Return the nearest Bee in a Place that is not the HIVE, connected to
         the ThrowerAnt's Place by following entrances.
@@ -201,7 +205,20 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        return random_or_none(self.place.bees)
+        place = self.place
+        bees = place.bees
+        range_atk = 0
+
+        while place.entrance != hive:
+            if len(bees) != 0 and self.min_range <= range_atk <= self.max_range:
+                return random_or_none(bees)
+            
+            place = place.entrance
+            bees = place.bees
+            range_atk += 1
+        
+        return random_or_none(bees)
+        
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -238,8 +255,9 @@ class FireAnt(Ant):
 
     name = 'Fire'
     damage = 3
+    food_cost = 5
     # BEGIN Problem 5
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 5
 
     def reduce_armor(self, amount):
@@ -248,7 +266,14 @@ class FireAnt(Ant):
         the current place.
         """
         # BEGIN Problem 5
-        "*** YOUR CODE HERE ***"
+        if self.armor - amount <= 0:
+            #self.place.remove_ant(self)
+            bees = self.place.bees.copy()
+            for bee in bees:
+                bee.reduce_armor(self.damage)
+
+        Insect.reduce_armor(self, amount) 
+
         # END Problem 5
 
 
@@ -256,8 +281,13 @@ class LongThrower(ThrowerAnt):
     """A ThrowerAnt that only throws leaves at Bees at least 5 places away."""
 
     name = 'Long'
+    damage = 1
+    food_cost = 2
+    max_range = float('inf')
+    min_range = 5
+
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 4
 
 
@@ -265,8 +295,13 @@ class ShortThrower(ThrowerAnt):
     """A ThrowerAnt that only throws leaves at Bees at most 3 places away."""
 
     name = 'Short'
+    damage = 1
+    food_cost = 2
+    max_range = 3
+    min_range = -1
+
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 4
 
 
@@ -300,23 +335,30 @@ class HungryAnt(Ant):
     While digesting, the HungryAnt can't eat another Bee.
     """
     name = 'Hungry'
+    food_cost = 4
+    time_to_digets = 3
     # BEGIN Problem 6
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 6
 
     def __init__(self):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        self.digesting = 0  # default since has not eaten anything
+        
         # END Problem 6
 
     def eat_bee(self, bee):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        bee.reduce_armor(bee.armor)
+        self.digesting = 3
         # END Problem 6
 
     def action(self, colony):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        if self.digesting == 0:
+            self.eat_bee(random_or_none(self.place.bees))
+        else:
+            self.digesting -= 1
         # END Problem 6
 
 
