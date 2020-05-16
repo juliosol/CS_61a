@@ -37,25 +37,24 @@ class Place(object):
 
         There can be any number of Bees in a Place.
         """
-        if insect.is_ant:
-            if self.ant is None:
-                self.ant = insect
-            else:
-                # BEGIN Problem 9
-                #if self.ant.container and self.ant.can_contain(insect):
-                if self.ant.can_contain(insect):
-                    #self.ant.contain_ant(insect)
-                    self.ant.ant = insect
-                    
-                #elif insect.container and insect.can_contain(self.ant):
-                elif insect.can_contain(self.ant):
-                    #insect.contain_ant(self.ant)
-                    insect.ant = self.ant
-                    self.ant = insect
-                
-                else:
-                    assert self.ant is None, 'Two ants in {0}'.format(self)
 
+        if insect.is_ant:
+            
+            if self.ant is not None:
+                # BEGIN Problem 9                 
+
+                if self.ant.container: #and self.ant.can_contain(insect):
+                    assert self.ant.can_contain(insect)
+                    self.ant.contain_ant(insect)
+                                    
+                elif insect.container and insect.can_contain(self.ant):
+                    assert self.ant.container is False
+                    insect.contain_ant(self.ant)
+                    self.ant = insect
+                    
+            else:  
+                assert self.ant is None, 'Two ants in {0}'.format(self)
+                self.ant = insect
                 # END Problem 9
         else:
             self.bees.append(insect)
@@ -75,7 +74,8 @@ class Place(object):
         if insect.is_ant:
             # Special handling for QueenAnt
             # BEGIN Problem 13
-            "*** YOUR CODE HERE ***"
+            if isinstance(insect, QueenAnt) and not insect.imposter:
+                return
             # END Problem 13
 
             # Special handling for BodyguardAnt
@@ -103,6 +103,7 @@ class Insect(object):
 
     is_ant = False
     damage = 0
+    watersafe = False
 
     def __init__(self, armor, place=None):
         """Create an Insect with an ARMOR amount and a starting PLACE."""
@@ -138,6 +139,7 @@ class Bee(Insect):
 
     name = 'Bee'
     damage = 1
+    watersafe = True
 
     def sting(self, ant):
         """Attack an ANT, reducing its armor by 1."""
@@ -177,6 +179,7 @@ class Ant(Insect):
     food_cost = 0
     blocks_path = True
     container = False
+    doubled = False
 
     def __init__(self, armor=1):
         """Create an Ant with an ARMOR quantity."""
@@ -267,7 +270,9 @@ class Water(Place):
     def add_insect(self, insect):
         """Add INSECT if it is watersafe, otherwise reduce its armor to 0."""
         # BEGIN Problem 11
-        "*** YOUR CODE HERE ***"
+        Place.add_insect(self, insect)
+        if not insect.watersafe:
+            insect.reduce_armor(insect.armor)
         # END Problem 11
 
 
@@ -360,7 +365,14 @@ class NinjaAnt(Ant):
 
 
 # BEGIN Problem 12
-# The ScubaThrower class
+class ScubaThrower(ThrowerAnt):
+    """
+    ScubaThrower ant that can survive in water places.
+    """
+    name = 'Scuba'
+    food_cost = 6
+    watersafe = True
+    implemented = True
 # END Problem 12
 
 
@@ -445,18 +457,25 @@ class TankAnt(BodyguardAnt):
         # END Problem 10
 
 # BEGIN Problem 13
-class QueenAnt(Ant):  # You should change this line
+class QueenAnt(ScubaThrower):  # You should change this line
 # END Problem 13
     """The Queen of the colony. The game is over if a bee enters her place."""
 
     name = 'Queen'
+    watersafe = True
+    food_cost = 7
     # BEGIN Problem 13
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem 13
+    imposter = False
+    instances = 0
 
     def __init__(self):
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        Ant.__init__(self)
+        if QueenAnt.instances == 1:
+            self.imposter = True
+        QueenAnt.instances += 1
         # END Problem 13
 
     def action(self, colony):
@@ -466,7 +485,28 @@ class QueenAnt(Ant):  # You should change this line
         Impostor queens do only one thing: reduce their own armor to 0.
         """
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        if self.imposter:
+            self.reduce_armor(self.armor)
+            return
+
+        ScubaThrower.action(self, colony)
+        curr_exit = self.place.exit
+        while curr_exit is not None:
+            if curr_exit.ant is not None:
+                curr_ant = curr_exit.ant
+                protected_ant = curr_exit.ant.ant if hasattr(curr_exit.ant, 'ant') else None
+                
+                if isinstance(curr_ant, BodyguardAnt) and protected_ant is not None:
+                    if protected_ant.doubled is False:
+                        protected_ant.damage = protected_ant.damage * 2
+                        protected_ant.doubled = True
+                
+                if curr_ant.doubled is False:
+                    curr_ant.damage = curr_ant.damage * 2
+                    curr_ant.doubled = True
+
+            curr_exit = curr_exit.exit
+
         # END Problem 13
 
     def reduce_armor(self, amount):
@@ -474,14 +514,16 @@ class QueenAnt(Ant):  # You should change this line
         remaining, signal the end of the game.
         """
         # BEGIN Problem 13
-        "*** YOUR CODE HERE ***"
+        ScubaThrower.reduce_armor(self, amount)
+        if self.imposter is False:
+            bees_win()
         # END Problem 13
 
 class AntRemover(Ant):
     """Allows the player to remove ants from the board in the GUI."""
 
     name = 'Remover'
-    implemented = False
+    implemented = True
 
     def __init__(self):
         Ant.__init__(self, 0)
@@ -497,7 +539,12 @@ def make_slow(action):
     action -- An action method of some Bee
     """
     # BEGIN Problem EC
-    "*** YOUR CODE HERE ***"
+    def new_action(colony):
+        if colony.time % 2 == 0:
+            return action(colony)
+        else:
+            return
+    return new_action
     # END Problem EC
 
 def make_stun(action):
@@ -506,13 +553,24 @@ def make_stun(action):
     action -- An action method of some Bee
     """
     # BEGIN Problem EC
-    "*** YOUR CODE HERE ***"
+    def new_action(colony):
+        return 
+    return new_action
     # END Problem EC
 
 def apply_effect(effect, bee, duration):
     """Apply a status effect to a BEE that lasts for DURATION turns."""
     # BEGIN Problem EC
-    "*** YOUR CODE HERE ***"
+    orig_action = bee.action
+    new_action = effect(orig_action)
+    def effect_duration(colony):
+        nonlocal duration
+        if duration > 0:
+            duration -= 1
+            return new_action(colony)
+        return orig_action(colony)
+    bee.action = effect_duration
+    return effect_duration
     # END Problem EC
 
 
@@ -520,8 +578,9 @@ class SlowThrower(ThrowerAnt):
     """ThrowerAnt that causes Slow on Bees."""
 
     name = 'Slow'
+    food_cost = 4
     # BEGIN Problem EC
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC
 
     def throw_at(self, target):
@@ -533,8 +592,9 @@ class StunThrower(ThrowerAnt):
     """ThrowerAnt that causes Stun on Bees."""
 
     name = 'Stun'
+    food_cost = 6
     # BEGIN Problem EC
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC
 
     def throw_at(self, target):

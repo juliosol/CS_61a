@@ -128,6 +128,8 @@ test = {
           ...         assert tank0.ant is harvester0,\
           ...                 'Contained ant was kicked out by {0}'.format(ant)
           ...         continue
+          ...     print(place0.ant is tank0)
+          ...     print(tank0.ant is harvester0)
           ...     assert False, 'No AssertionError raised when adding {0}'.format(ant)
           >>> # Add harvester before tank
           >>> place1.add_insect(harvester1)
