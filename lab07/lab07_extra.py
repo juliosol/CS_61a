@@ -62,6 +62,11 @@ def has_cycle(link):
     False
     """
     tmp_first = link
+    while link is not Link.empty:
+        link = link.rest
+        if link == tmp_first:
+            return True
+    return False
 
 
 def has_cycle_constant(link):
@@ -75,7 +80,7 @@ def has_cycle_constant(link):
     >>> has_cycle_constant(t)
     False
     """
-    "*** YOUR CODE HERE ***"
+    
 
 # Q9
 def reverse_other(t):
@@ -91,6 +96,11 @@ def reverse_other(t):
     >>> t
     Tree(1, [Tree(8, [Tree(3, [Tree(5), Tree(4)]), Tree(6, [Tree(7)])]), Tree(2)])
     """
-    level = 1s
-    branches = t.branches
-            
+    new_list = []
+    for b in t.branches:
+        new_list.append(b.label)
+        for br in b.branches:
+            reverse_other(br)
+    new_list.reverse()
+    for i, b in enumerate(t.branches):
+        b.label = new_list[i]
