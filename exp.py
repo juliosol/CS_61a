@@ -1,81 +1,143 @@
-class Baller:
-    all_players = []
-    def __init__(self, name, has_ball  = False):
-        self.name = name
-        self.has_ball = has_ball
-        Baller.all_players.append(self)
+class Link:
+    """A linked list.
+
+    >>> s = Link(1)
+    >>> s.first
+    1
+    >>> s.rest is Link.empty
+    True
+    >>> s = Link(2, Link(3, Link(4)))
+    >>> s.second
+    3
+    >>> s.first = 5
+    >>> s.second = 6
+    >>> s.rest.rest = Link.empty
+    >>> s                                    # Displays the contents of repr(s)
+    Link(5, Link(6))
+    >>> s.rest = Link(7, Link(Link(8, Link(9))))
+    >>> s
+    Link(5, Link(7, Link(Link(8, Link(9)))))
+    >>> print(s)                             # Prints str(s)
+    <5 7 <8 9>>
+    """
+    empty = ()
+
+    def __init__(self, first, rest=empty):
+        assert rest is Link.empty or isinstance(rest, Link)
+        self.first = first
+        self.rest = rest
+
+    @property
+    def second(self):
+        return self.rest.first
+
+    @second.setter
+    def second(self, value):
+        self.rest.first = value
+
+
+    def __repr__(self):
+        if self.rest is not Link.empty:
+            rest_repr = ', ' + repr(self.rest)
+        else:
+            rest_repr = ''
+        return 'Link(' + repr(self.first) + rest_repr + ')'
+
+    def __str__(self):
+        string = '<'
+        while self.rest is not Link.empty:
+            string += str(self.first) + ' '
+            self = self.rest
+        return string + str(self.first) + '>'
+
+class Tree:
+    def __init__(self, label, branches=[]):
+        for c in branches:
+            assert isinstance(c, Tree)
+        self.label = label
+        self.branches = list(branches)
+
+    def __repr__(self):
+        if self.branches:
+            branches_str = ', ' + repr(self.branches)
+        else:
+            branches_str = ''
+        return 'Tree({0}{1})'.format(self.label, branches_str)
+
+    def is_leaf(self):
+        return not self.branches
+
+    def __eq__(self, other):
+        return type(other) is type(self) and self.label == other.label \
+               and self.branches == other.branches
     
-    def pass_ball(self, other_player):
-        if self.has_ball:
-            self.has_ball = False
-            other_player.has_ball = True
-            return True
-        else:
-            return False
+    def __str__(self):
+        def print_tree(t, indent=0):
+            tree_str = '  ' * indent + str(t.label) + "\n"
+            for b in t.branches:
+                tree_str += print_tree(b, indent + 1)
+            return tree_str
+        return print_tree(self).rstrip()
 
-class BallHog(Baller):
-    def pass_ball(self, other_player):
-        return False
+    def copy_tree(self):
+        return Tree(self.label, [b.copy_tree() for b in self.branches])
 
-class TeamBaller(Baller):
-    def pass_ball(self, other):
-        if self.has_ball:
-            self.has_ball = False
-            other.has_ball = True
-            print('Yay!')
-            return True
-        else:
-            print('I don\'t have the ball')
-            return False
 
-def has_seven(k):
-    if k % 10 == 7:
-        return True
-    elif k < 10:
-        return False
+def eval_tree(tree):
+    if type(tree.label) is int:
+        return tree.label
     else:
-        return has_seven(k//10)
+        if tree.label == '*':
+            prod = 1
+            for b in tree.branches:
+                prod = prod * eval_tree(b)
+            return prod
+        if tree.label == '+':
+            sum_val = 0
+            for b in tree.branches:
+                sum_val = sum_val + eval_tree(b)
+            return sum_val
 
-class PingPongTracker:
+
+class Worker:
+    greeting = 'Sir'
     def __init__(self):
-        self.current = 0
-        self.index = 1
-        self.add = True
-    
-    def next(self):
-        if has_seven(self.index) or self.index % 7 == 0:
-            self.add = not self.add
-        if self.add:
-            self.current += 1
+        self.elf = Worker
+    def work(self):
+        return self.greeting + ', I work'
+    def __repr__(self):
+        return Bourgeoisie.greeting
+
+class Bourgeoisie(Worker):
+    greeting = 'Peon'
+    def work(self):
+        print(Worker.work(self))
+        return 'My job is to gather wealth'
+
+class Proletariat(Worker):
+    greeting = 'Comrade'
+    def work(self, other):
+        other.greeting = self.greeting + ' ' + other.greeting
+        other.work()
+        return other
+
+jack = Worker()
+john = Bourgeoisie()
+jack.greeting = 'Maam'
+
+class Dress:
+    seen = 0
+    color = None
+
+    def __init__(self, color):
+        self.color = color
+        self.seen = 0
+
+    def look(self):
+        self.seen += 1
+        Dress.seen += 1
+        if Dress.seen % self.seen == 0:
+            Dress.color = self.color
+            return self.color
         else:
-            self.current -= 1
-        self.index += 1
-        return self.current
-
-class Bird:
-    def __init__(self, call):
-        self.call = call
-        self.can_fly = True
-    
-    def fly(self):
-        if self.can_fly:
-            return 'Don\'t  stop me now!'
-        else:
-            return 'Ground control to Major Tom...'
-
-    def speak(self):
-        print(self.call)
-
-class Chicken(Bird):
-    def speak(self, other):
-        Bird.speak(self)
-        other.speak()
-
-class Penguin(Bird):
-    can_fly = False
-    def speak(self):
-        call = 'Ice to meet you'
-        print(call)
-
-andre = Chicken('cluck')
-gunter = Penguin('noot')
+            self.color = Dress.color
