@@ -141,3 +141,27 @@ class Dress:
             return self.color
         else:
             self.color = Dress.color
+
+def skip(lst):
+    while lst is not Link.empty:
+        lst.rest = lst.rest.rest
+        lst = lst.rest
+
+def factor_tree(n):
+    for i in range(1,n):
+        if n % i == 0 and i != 1:
+            return Tree(n, [Tree(i), factor_tree(n//i)])
+    return Tree(n)
+
+def double1(L):
+    result = Link.empty
+    last = None
+
+    while L is not Link.empty:
+        if last is None:
+            last = L.first
+            result = Link(last, Link(last, result))
+        
+        else:
+            last = L.first
+            result.rest.rest = 
