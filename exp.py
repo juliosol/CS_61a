@@ -153,15 +153,23 @@ def factor_tree(n):
             return Tree(n, [Tree(i), factor_tree(n//i)])
     return Tree(n)
 
-def double1(L):
-    result = Link.empty
-    last = None
 
-    while L is not Link.empty:
-        if last is None:
-            last = L.first
-            result = Link(last, Link(last, result))
-        
-        else:
-            last = L.first
-            result.rest.rest = 
+class Plant:
+    k = 1
+    kind = 'green'
+
+    def __init__(self):
+        self.k = Plant.k
+        Plant.k = self.k + 1
+        if self.k > 3:
+            Plant.name = lambda t: "tree"
+            Plant.k = 6
+
+    def name(self):
+        return kind
+
+class Flower(Plant):
+    kind = "pretty"
+
+    
+
