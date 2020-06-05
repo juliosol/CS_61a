@@ -185,8 +185,6 @@ class LambdaProcedure(Procedure):
         """Make a frame that binds my formal parameters to ARGS, a Scheme list
         of values, for a lexically-scoped call evaluated in environment ENV."""
         # BEGIN PROBLEM 12
-        #print(self.formals)
-        #print(args)
         return self.env.make_child_frame(self.formals, args)
         # END PROBLEM 12
 
@@ -333,7 +331,17 @@ def make_let_frame(bindings, env):
     if not scheme_listp(bindings):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
-    "*** YOUR CODE HERE ***"
+    formals = nil
+    vals = nil
+    while bindings is not nil:
+        binding = bindings.first
+        check_form(binding, 2, max=2)
+        formals = Pair(binding.first, formals)
+        vals = Pair(scheme_eval(binding.second.first, env), vals)
+        bindings = bindings.second
+    check_formals(formals)
+    return env.make_child_frame(formals, vals)
+
     # END PROBLEM 15
 
 def do_define_macro(expressions, env):
@@ -421,7 +429,8 @@ class MuProcedure(Procedure):
         self.body = body
 
     # BEGIN PROBLEM 16
-    "*** YOUR CODE HERE ***"
+    def make_call_frame(self, args, env):
+        return env.make_child_frame(self.formals, args)
     # END PROBLEM 16
 
     def __str__(self):
@@ -437,7 +446,7 @@ def do_mu_form(expressions, env):
     formals = expressions.first
     check_formals(formals)
     # BEGIN PROBLEM 16
-    "*** YOUR CODE HERE ***"
+    return MuProcedure(formals, expressions.second)
     # END PROBLEM 16
 
 SPECIAL_FORMS['mu'] = do_mu_form
