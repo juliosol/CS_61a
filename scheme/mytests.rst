@@ -10,4 +10,10 @@ Suite 1
     Case Example
         >>> scheme_read(Buffer(tokenize_lines(['nil'])))
         nil
+        
+    Case 1
+        >>> scheme_read(Buffer(tokenize_lines(['(1 (2 3) . 4)'])))
+        Pair(1, Pair(Pair(2, Pair(3, nil)), 4))
 
+        >>> scheme_read(Buffer(tokenize_lines(['(1 2 3)'])))
+        Pair(1, Pair(2, Pair(3, nil)))

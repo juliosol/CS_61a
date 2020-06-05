@@ -7,7 +7,79 @@
 ;;; after the last test you wish to run.
 
 ;;; ********************************
-;;; *** Add your own tests here! ***
+
+(+ 2 4 8)
+; expect 14
+
+(+ 3 4 (* 4 2) (- 9 4))
+; expect 20
+
+(/ 18 2)
+; expect 9
+
+(/ 18 0)
+; expect Error
+
+(/ 18 (* 3 2) (- (* (+ 3 2) 2) 9))
+; expect 3
+
+(define x 3)
+; expect x
+
+x
+; expect 3
+
+(define tau (* 31 3))
+; expect tau
+
+tau
+; expect 93
+
+'(1 . 2)
+; expect (1 . 2)
+
+'hello
+; expect hello
+
+(car '(a b))
+; expect a
+
+(begin (+ 2 3) (* 23 2))
+; expect 46
+
+(define x (begin (+ 3 2) 2))
+; expect x
+
+(+ x 4)
+; expect 6
+
+(define (cube x) (* x x x))
+; expect cube
+
+cube
+; (lambda (x) (* x x x))
+
+(define (square x) (* x x))
+; expect square
+
+square
+; expect (lambda (x) (* x x))
+
+(define (to-sixth x) (cube (square x)))
+; expect to-sixth
+
+to-sixth
+; expect (lambda (x) (cube (square x)))
+
+(square 3)
+; expect 9
+
+(cube 2)
+; expect 8
+
+(to-sixth 2)
+; expect 64
+
 ;;; ********************************
 ; BEGIN PROBLEM 0
 'replace-this-line
@@ -57,12 +129,6 @@
       6))
 ; expect 57
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Move the following (exit) line down the file to run additional tests. ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(exit)
-
-
 ;;; 1.1.2
 
 (define size 2)
@@ -108,6 +174,11 @@ circumference
   (sum-of-squares (+ a 1) (* a 2)))
 (f 5)
 ; expect 136
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Move the following (exit) line down the file to run additional tests. ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(exit)
 
 ;;; 1.1.6
 
@@ -224,6 +295,8 @@ circumference
       (y (+ x 2)))
   (* x y))
 ; expect 21
+
+
 
 ;;; 2.1.1
 
