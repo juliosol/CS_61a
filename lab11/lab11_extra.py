@@ -113,8 +113,15 @@ def remainders_generator(m):
     7
     11
     """
+    def gen_helper(i):
+        while True:
+            yield i
+            i += m
     
-
+    counter = 0
+    while counter < m:
+        yield gen_helper(counter)
+        counter += 1
 # Q9
 def zip_generator(*iterables):
     """
@@ -128,4 +135,13 @@ def zip_generator(*iterables):
     [1, 4, 7]
     [2, 5, 8]
     """
-    "*** YOUR CODE HERE ***"
+    n = 0
+    while True:
+        lst = []
+        n += 1
+        for it in iterables:
+            i = iter(it)
+            for j in range(n):
+                te = next(i)
+            lst.append(te)
+        yield lst
